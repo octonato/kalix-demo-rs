@@ -1,0 +1,45 @@
+
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "kalix/annotations.proto";
+import "google/api/annotations.proto";
+
+import "kalix/demo/counter_api.proto";
+import "kalix/demo/domain/counter_domain.proto";
+
+package kalix.demo.views;
+
+
+
+message ByValueRequest {
+  int32 value = 1;
+}
+
+service CountersByValue {
+
+  option (kalix.service).acl.allow = { principal: ALL };
+  option (kalix.codegen) = {
+    view: {}
+  };
+
+
+  rpc OnUpdate(kalix.demo.domain.CounterState) returns (kalix.demo.CurrentCounter) {
+    option (kalix.method).eventing.in = {
+      value_entity: "counter"
+    };
+
+    option (kalix.method).view.update = {
+      table: "counters"
+      transform_updates: true
+    };
+  }
+
+
+  rpc GetCounters(ByValueRequest) returns (stream kalix.demo.CurrentCounter) {
+    option (kalix.method).view.query = {
+      query: "SELECT * FROM counters WHERE value >= :value"
+    };
+  }
+
+}
