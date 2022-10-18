@@ -1,4 +1,4 @@
-# kalix-demo-rs
+# Kalix Demo for Reactive Summit 2022
 
 ## Designing
 
