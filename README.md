@@ -38,21 +38,21 @@ To start the application locally, start it from your IDE or use:
 sbt run
 ```
 
-With both the proxy and your application running, any defined endpoints should be available at `http://localhost:9000`. In addition to the defined gRPC interface, each method has a corresponding HTTP endpoint. Unless configured otherwise (see [Transcoding HTTP](https://docs.kalix.io/java/proto.html#_transcoding_http)), this endpoint accepts POST requests at the path `/[package].[entity name]/[method]`. For example, using `curl`:
+Using [`grpcurl`](https://github.com/fullstorydev/grpcurl):
+
+## Create two counters (foo and bar)
 
 ```shell
-> curl -XPOST -H "Content-Type: application/json" localhost:9000/kalix.demo.CounterService/GetCurrentCounter -d '{"counterId": "foo"}'
-The command handler for `GetCurrentCounter` is not implemented, yet
+> grpcurl -d '{"counterId": "foo", "value": 20 }' -plaintext localhost:9000 kalix.demo.CounterService/Increase
+> grpcurl -d '{"counterId": "bar", "value": 8  }' -plaintext localhost:9000 kalix.demo.CounterService/Increase
 ```
 
-For example, using [`grpcurl`](https://github.com/fullstorydev/grpcurl):
+## Query by value
 
 ```shell
-> grpcurl -plaintext -d '{"counterId": "foo"}' localhost:9000 kalix.demo.CounterService/GetCurrentCounter 
-ERROR:
-  Code: Unknown
-  Message: The command handler for `GetCurrentCounter` is not implemented, yet
+grpcurl  -d '{ "value": 10 }' -plaintext localhost:9000 kalix.demo.views.CountersByValue/GetCounters
 ```
+
 
 > Note: The failure is to be expected if you have not yet provided an implementation of `GetCurrentCounter` in
 > your entity.
